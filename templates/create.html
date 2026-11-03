@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Cook with your pantry{% endblock %}
+{% block content %}
+<section class="page-shell">
+  <div class="page-intro"><span class="eyebrow">Fresh from your pantry</span><h1>What sounds good today?</h1><p>Share what you have and your preferences. BiteCraft will create a few tailored meal ideas and keep the recipes in your kitchen.</p></div>
+  <div class="generator-card" style="max-width:760px">
+    <div class="generator-title"><strong>Build my meal ideas</strong><small>Your preferences stay with your search</small></div>
+    <form method="post" action="{{ url_for('create') }}" id="ingredient-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label class="field-label" for="ingredients">Ingredients you have</label>
+      <textarea class="ingredient-entry" id="ingredients" name="ingredients" required placeholder="chickpeas, lemon, spinach">{{ request.form.get('ingredients', '') }}</textarea>
+      <div class="ingredient-chips" id="ingredient-chips" aria-live="polite"></div>
+      <p class="ingredient-hint">Separate ingredients with commas. Add up to 30.</p>
+      <div class="option-row">
+        <div><label class="field-label" for="diet">Eating style</label><select class="field-control" id="diet" name="diet"><option>No preference</option><option {% if request.form.get('diet') == 'Vegetarian' %}selected{% endif %}>Vegetarian</option><option {% if request.form.get('diet') == 'Vegan' %}selected{% endif %}>Vegan</option><option {% if request.form.get('diet') == 'High protein' %}selected{% endif %}>High protein</option><option {% if request.form.get('diet') == 'Gluten-free' %}selected{% endif %}>Gluten-free</option></select></div>
+        <div><label class="field-label" for="max_time">Cooking time</label><select class="field-control" id="max_time" name="max_time">{% for minutes in [15,30,60,120] %}<option value="{{ minutes }}" {% if request.form.get('max_time', '30')|int == minutes %}selected{% endif %}>{{ 'Up to 2 hours' if minutes == 120 else minutes|string + ' minutes' }}</option>{% endfor %}</select></div>
+      </div>
+      <div class="option-row">
+        <div><label class="field-label" for="meal_type">Meal</label><select class="field-control" id="meal_type" name="meal_type"><option value="">Any meal</option><option value="појадок" {% if request.form.get('meal_type') == 'појадок' %}selected{% endif %}>Breakfast</option><option value="ручек" {% if request.form.get('meal_type') == 'ручек' %}selected{% endif %}>Lunch</option><option value="вечера" {% if request.form.get('meal_type') == 'вечера' %}selected{% endif %}>Dinner</option></select></div>
+        <div><label class="field-label" for="allergens">Avoid these allergens</label><input class="field-control" id="allergens" name="allergens" value="{{ request.form.get('allergens', '') }}" placeholder="e.g. peanuts, dairy"></div>
+      </div>
+      <div style="margin-top:14px"><label class="field-label" for="language">Recipe language</label><select class="field-control" id="language" name="language"><option value="en" {% if request.form.get('language', 'en') == 'en' %}selected{% endif %}>English</option><option value="mk" {% if request.form.get('language') == 'mk' %}selected{% endif %}>Македонски</option></select></div>
+      <label class="basics-check"><input type="checkbox" name="has_basics" {% if request.method == 'GET' or request.form.get('has_basics') %}checked{% endif %}> I have the basics: oil, salt & pepper</label>
+      <button class="button button-primary" type="submit">Find my next meal <span aria-hidden="true">✦</span></button>
+      <p class="safety-note">Allergy note: please confirm ingredient labels and possible cross-contact before cooking.</p>
+    </form>
+  </div>
+  {% if recipes %}
+    <div class="section-heading" style="margin-top:45px"><div><span class="eyebrow">Made for your pantry</span><h2>Three fresh ideas</h2></div><span class="subtle" style="font-size:11px">{{ request.form.get('ingredients', '') }}</span></div>
+    <div class="recipe-grid">{% for recipe in recipes %}<article class="recipe-card"><a class="recipe-photo" href="{{ recipe.url }}"><img src="{{ recipe_image(recipe.id) }}" alt="Serving suggestion for {{ recipe.title }}" loading="lazy"><span class="photo-tag">{{ recipe.meal_type|capitalize }}</span></a><div class="recipe-card-body"><h3><a href="{{ recipe.url }}">{{ recipe.title }}</a></h3><p>{{ recipe.description }}</p><div class="recipe-meta"><span>{{ recipe.time_minutes }} min</span><span>{{ recipe.ingredients|length }} ingredients</span></div><p style="margin-top:13px"><strong>Why it fits:</strong> {{ recipe.explanation }}</p>{% if recipe.tips %}<p style="margin-top:7px"><strong>Kitchen tip:</strong> {{ recipe.tips }}</p>{% endif %}</div></article>{% endfor %}</div>
+  {% endif %}
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/ingredients.js') }}" defer></script>{% endblock %}

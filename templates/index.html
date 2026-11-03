@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Good food starts in your kitchen{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-topline"><span>A little inspiration, freshly made</span><span>{{ total_recipes }} recipes in the community kitchen</span></div>
+  <div class="hero-columns">
+    <div class="hero-copy">
+      <span class="eyebrow">Cook with what you have</span>
+      <h1>Good food starts in your kitchen.</h1>
+      <p>Tell us what’s in your pantry. We’ll help you turn everyday ingredients into something worth gathering around.</p>
+      <section class="generator-card" id="meal-maker">
+        <div class="generator-title"><strong>What’s in your kitchen?</strong><small>AI meal ideas, made for you</small></div>
+        <form method="post" action="{{ url_for('create') }}" id="ingredient-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <label class="field-label" for="ingredients">Your ingredients</label>
+          <textarea class="ingredient-entry" id="ingredients" name="ingredients" placeholder="Add a few ingredients, separated by commas…&#10;e.g. chickpeas, lemon, spinach" required></textarea>
+          <div class="ingredient-chips" id="ingredient-chips" aria-live="polite"></div>
+          <p class="ingredient-hint">Add commas to see your ingredient list take shape.</p>
+          <div class="option-row">
+            <div><label class="field-label" for="diet">Eating style</label><select class="field-control" id="diet" name="diet"><option>No preference</option><option>Vegetarian</option><option>Vegan</option><option>High protein</option><option>Gluten-free</option></select></div>
+            <div><label class="field-label" for="max_time">Ready in</label><select class="field-control" id="max_time" name="max_time"><option value="15">15 minutes</option><option value="30" selected>30 minutes</option><option value="60">60 minutes</option><option value="120">Up to 2 hours</option></select></div>
+          </div>
+          <div class="option-row">
+            <div><label class="field-label" for="meal_type">Meal</label><select class="field-control" id="meal_type" name="meal_type"><option value="">Any meal</option><option value="појадок">Breakfast</option><option value="ручек">Lunch</option><option value="вечера">Dinner</option></select></div>
+            <div><label class="field-label" for="allergens">Avoid (optional)</label><input class="field-control" id="allergens" name="allergens" placeholder="e.g. peanuts, dairy"></div>
+          </div>
+          <div style="margin-top:14px"><label class="field-label" for="language">Recipe language</label><select class="field-control" id="language" name="language"><option value="en">English</option><option value="mk">Македонски</option></select></div>
+          <label class="basics-check"><input type="checkbox" name="has_basics" checked> I have the basics: oil, salt & pepper</label>
+          <button class="button button-primary" type="submit">Find my next meal <span aria-hidden="true">✦</span></button>
+          <p class="safety-note">AI ideas are a starting point. If you have allergies, always check every ingredient label.</p>
+        </form>
+      </section>
+    </div>
+    <div class="hero-art">
+      <img src="{{ url_for('static', filename='images/recipes/figma-food-02.jpg') }}" alt="A colourful home-cooked meal shared at a table">
+      <div class="hero-art-caption"><span class="eyebrow">A seat at the table, always</span><h2>There’s always something good to make.</h2><p>A few everyday ingredients. A little inspiration. A place to make it your own.</p></div>
+    </div>
+  </div>
+</section>
+<section class="discovery-below">
+  <div class="section-heading"><div><span class="eyebrow">From our community kitchen</span><h2>A recipe for the moment.</h2></div><a class="text-link" href="{{ url_for('recipe_list') }}">Explore the recipe collection ↗</a></div>
+  {% if recipes %}<div class="recipe-grid">{% for recipe in recipes %}{% include "_recipe_card.html" %}{% endfor %}</div>{% else %}<div class="empty-state"><h2>Your kitchen’s first idea starts here.</h2><p>Add sample recipes to get started: run <code>python seed.py --include-samples</code>.</p><a class="button button-primary" href="{{ url_for('create') }}">Find a meal with AI</a></div>{% endif %}
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/ingredients.js') }}" defer></script>{% endblock %}

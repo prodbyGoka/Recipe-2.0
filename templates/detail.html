@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{{ recipe.title }}{% endblock %}
+{% block content %}
+<section class="page-shell">
+  <p class="eyebrow"><a href="{{ url_for('recipe_list') }}">Recipe collection</a> &nbsp;·&nbsp; {{ recipe.meal_type|capitalize }}</p>
+  <div class="detail-hero">
+    <div class="detail-copy"><span class="eyebrow">A BiteCraft kitchen favourite</span><h1>{{ recipe.title }}</h1><p>{{ recipe.description }}</p><div class="detail-stats"><span><strong>{{ recipe.time_minutes }} min</strong>total time</span><span><strong>{{ recipe.ingredient_links|length }}</strong>ingredients</span><span><strong>★ {{ average_rating or 'New' }}</strong>{{ reviews|length }} reviews</span></div>
+      <div class="detail-actions">{% if current_user %}<form method="post" action="{{ url_for('toggle_saved_recipe', recipe_id=recipe.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="next" value="{{ request.path }}"><button class="button {{ 'button-light' if is_saved else 'button-primary' }}" type="submit">{{ '✓ Saved to my recipe box' if is_saved else '♡ Save recipe' }}</button></form>{% else %}<a class="button button-primary" href="{{ url_for('login', next=request.path) }}">♡ Log in to save</a>{% endif %}<a class="button button-quiet" href="{{ url_for('recipe_list') }}">Browse more recipes</a></div>
+    </div>
+    <div class="detail-image"><img src="{{ recipe_image(recipe.id) }}" alt="{{ recipe.title }}"></div>
+  </div>
+  <div class="detail-layout">
+    <section class="detail-panel"><h2>What you’ll need</h2><ul class="ingredient-list">{% for link in recipe.ingredient_links %}<li><input type="checkbox" aria-label="Mark {{ link.ingredient.name }} as ready"><span>{{ link.ingredient.name }}</span><span class="ingredient-quantity">{{ link.quantity }}</span></li>{% endfor %}</ul>{% if recipe.equipment_names %}<h2 style="margin-top:36px">Kitchen tools</h2><p class="subtle" style="font-size:12px;line-height:1.7">{{ recipe.equipment_names|join(', ') }}</p>{% endif %}</section>
+    <section class="detail-panel"><h2>Let’s make it</h2><ol class="step-list">{% for step in recipe.steps_list %}<li><div><strong>Step {{ loop.index }}</strong><p>{{ step }}</p></div></li>{% endfor %}</ol>
+      {% if ai_result %}<div class="review-card" style="background:#eaf0e4;margin-top:18px"><strong>From the kitchen</strong><p>{{ ai_result.explanation }}</p>{% if ai_result.substitutions %}<p><b>Easy swaps:</b> {{ ai_result.substitutions }}</p>{% endif %}{% if ai_result.tips %}<p><b>Little tip:</b> {{ ai_result.tips }}</p>{% endif %}</div>{% endif %}
+    </section>
+  </div>
+  <section class="review-section"><div class="section-heading"><div><span class="eyebrow">Around the table</span><h2>Cooked it? Tell us how it went.</h2></div><span class="text-link">★ {{ average_rating or 'New' }} · {{ reviews|length }} reviews</span></div>
+    <div class="review-grid"><section class="review-form"><h3>{% if own_review %}Update your note{% else %}Leave a recipe review{% endif %}</h3>{% if current_user %}<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><label class="field-label" for="rating">Your rating</label><select class="field-control" id="rating" name="rating">{% for value in range(5, 0, -1) %}<option value="{{ value }}" {% if own_review and own_review.rating == value %}selected{% endif %}>{{ value }} stars</option>{% endfor %}</select><label class="field-label" for="body" style="margin-top:15px">Your note</label><textarea class="text-area" id="body" name="body" maxlength="2000" required placeholder="What did you enjoy? Any little changes you made?">{{ own_review.body if own_review else '' }}</textarea><button class="button button-primary" type="submit" style="margin-top:13px">Share my review</button></form>{% else %}<p class="subtle" style="font-size:12px;line-height:1.7">Sign in to share your own kitchen notes and save recipes to your recipe box.</p><a class="button button-primary" href="{{ url_for('login', next=request.path) }}">Log in to review</a>{% endif %}</section>
+      <div>{% for review in reviews %}<article class="review-card"><div class="review-card-head"><strong>{{ review.user.username }}</strong><span class="rating">★ {{ review.rating }}/5</span></div><p>{{ review.body }}</p><p class="subtle" style="font-size:10px">{{ review.created_at.strftime('%d %b %Y') }}</p></article>{% else %}<div class="empty-state"><h2>Pull up a chair.</h2><p>Be the first to share what you thought of this recipe.</p></div>{% endfor %}</div>
+    </div>
+  </section>
+</section>
+{% endblock %}

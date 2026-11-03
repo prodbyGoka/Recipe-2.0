@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Recipe collection{% endblock %}
+{% block content %}
+<section class="page-shell">
+  <div class="page-intro"><span class="eyebrow">Made around the table</span><h1>Find your next favourite.</h1><p>Browse easygoing recipes from our community kitchen, or search for a dish you’re craving.</p></div>
+  <form class="search-toolbar" method="get" action="{{ url_for('recipe_list') }}"><input class="search-field" name="q" value="{{ search_text }}" placeholder="Search recipes, ingredients, or a feeling…" aria-label="Search recipes"><select class="search-field" name="meal_type"><option value="">Every kind of meal</option><option value="појадок" {% if meal_type == 'појадок' %}selected{% endif %}>Breakfast</option><option value="ручек" {% if meal_type == 'ручек' %}selected{% endif %}>Lunch</option><option value="вечера" {% if meal_type == 'вечера' %}selected{% endif %}>Dinner</option></select><button class="button button-primary" type="submit">Find recipes</button></form>
+  <div class="filter-bar"><span class="filter-pill active">All recipes</span><a class="filter-pill" href="{{ url_for('recipe_list', meal_type='појадок') }}">Breakfast</a><a class="filter-pill" href="{{ url_for('recipe_list', meal_type='ручек') }}">Lunch</a><a class="filter-pill" href="{{ url_for('recipe_list', meal_type='вечера') }}">Dinner</a></div>
+  {% if recipes %}<div class="recipe-grid">{% for recipe in recipes %}{% include "_recipe_card.html" %}{% endfor %}</div>{% else %}<div class="empty-state"><h2>No recipes in this batch yet.</h2><p>Try another search, or let AI turn your ingredients into something delicious.</p><a class="button button-primary" href="{{ url_for('create') }}">Cook with my pantry</a></div>{% endif %}
+</section>
+{% endblock %}

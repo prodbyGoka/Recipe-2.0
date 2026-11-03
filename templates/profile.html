@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}My kitchen{% endblock %}
+{% block content %}
+<section class="page-shell"><div class="page-intro"><span class="eyebrow">Your little corner of BiteCraft</span><h1>Welcome back, {{ user.username }}.</h1><p>Keep the recipes you love close and find your kitchen notes all in one place.</p></div>
+  <div class="profile-card"><span class="profile-avatar">{{ user.username[0]|upper }}</span><div><h2>{{ user.username }}</h2><p>At the table since {{ user.created_at.strftime('%B %Y') }} · {{ user.reviews|length }} community reviews</p></div><a class="button button-light" style="margin-left:auto" href="{{ url_for('saved_recipes') }}">My recipe box</a></div>
+  <div class="section-heading" style="margin-top:42px"><div><span class="eyebrow">Your kitchen notes</span><h2>Reviews you’ve shared</h2></div></div>
+  {% for review in user.reviews %}<article class="review-card" style="margin-bottom:12px"><div class="review-card-head"><strong><a href="{{ url_for('recipe_detail', recipe_id=review.recipe.id) }}">{{ review.recipe.title }}</a></strong><span class="rating">★ {{ review.rating }}/5</span></div><p>{{ review.body }}</p><p class="subtle" style="font-size:10px">{{ review.created_at.strftime('%d %b %Y') }}</p></article>{% else %}<div class="empty-state"><h2>Your kitchen notes start here.</h2><p>After you cook a recipe, share what worked and save the little changes you made.</p><a class="button button-primary" href="{{ url_for('recipe_list') }}">Find a recipe</a></div>{% endfor %}
+</section>
+{% endblock %}

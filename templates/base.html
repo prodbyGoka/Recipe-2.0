@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f7f1">
+  <meta name="description" content="A little inspiration for whatever is in your kitchen. Find, cook, and save recipes with BiteCraft.">
+  <title>{% block title %}Fresh ideas for your kitchen{% endblock %} · BiteCraft</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="{{ url_for('index') }}" aria-label="BiteCraft home">
+      <span class="brand-mark" aria-hidden="true">✳</span><span>BiteCraft</span>
+    </a>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a class="{% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}">Discover</a>
+      <a class="{% if request.endpoint == 'recipe_list' %}active{% endif %}" href="{{ url_for('recipe_list') }}">Recipes</a>
+      {% if current_user %}<a class="{% if request.endpoint == 'saved_recipes' %}active{% endif %}" href="{{ url_for('saved_recipes') }}">My recipe box</a>{% endif %}
+    </nav>
+    <div class="header-actions">
+      {% if current_user %}
+        <a class="account-link" href="{{ url_for('profile') }}"><span class="avatar">{{ current_user.username[0]|upper }}</span><span>{{ current_user.username }}</span></a>
+        <form class="inline" method="post" action="{{ url_for('logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="button button-quiet button-small" type="submit">Log out</button></form>
+      {% else %}
+        <a class="button button-quiet button-small" href="{{ url_for('login') }}">Log in</a>
+        <a class="button button-primary button-small" href="{{ url_for('register') }}">Create account <span aria-hidden="true">↗</span></a>
+      {% endif %}
+    </div>
+  </header>
+  <main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}<div class="flash-stack">{% for category, message in messages %}<p class="flash {{ category }}">{{ message }}</p>{% endfor %}</div>{% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="site-footer">
+    <a class="brand brand-footer" href="{{ url_for('index') }}"><span class="brand-mark" aria-hidden="true">✳</span><span>BiteCraft</span></a>
+    <p>Good food starts with what you have.</p>
+    <div><a href="{{ url_for('recipe_list') }}">Recipe collection</a><a href="{{ url_for('create') }}">Find a meal</a></div>
+    <span class="footer-note">Made for everyday kitchens · © BiteCraft</span>
+  </footer>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

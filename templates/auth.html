@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Create account' if mode == 'register' else 'Log in' }}{% endblock %}
+{% block content %}
+<section class="auth-layout">
+  <div class="auth-form-side"><div class="auth-form"><span class="eyebrow">Back to BiteCraft</span><h1>{{ 'Come on in.' if mode == 'login' else 'Join the table.' }}</h1><p>{{ 'Your recipe box, kitchen notes, and next delicious idea are right where you left them.' if mode == 'login' else 'Make a little space for your favourite meals, saved recipes, and new ideas.' }}</p>
+    <form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><label for="username">Username</label><input id="username" name="username" autocomplete="username" minlength="3" maxlength="30" required value="{{ request.form.get('username', '') }}" placeholder="Your kitchen name"><label for="password">Password{% if mode == 'register' %} · 8 characters minimum{% endif %}</label><input id="password" name="password" type="password" autocomplete="{{ 'new-password' if mode == 'register' else 'current-password' }}" {% if mode == 'register' %}minlength="8"{% endif %} required placeholder="••••••••"><button class="button button-primary" type="submit">{{ 'Create my account' if mode == 'register' else 'Welcome back' }} <span aria-hidden="true">↗</span></button></form>
+    <p class="auth-switch">{{ 'Already have an account?' if mode == 'register' else 'New to BiteCraft?' }} <a href="{{ url_for('login' if mode == 'register' else 'register') }}">{{ 'Log in' if mode == 'register' else 'Create an account' }}</a></p>
+  </div></div>
+  <div class="auth-art"><img src="{{ url_for('static', filename='images/recipes/figma-food-04.jpg') }}" alt="Fresh ingredients ready to make a meal"><div class="auth-art-copy"><span class="eyebrow" style="color:#f0d4b8">Good food, less waste</span><h2>There’s always something good in your BiteCraft kitchen.</h2><p>Save the meals you love, discover your community’s best ideas, and cook with what’s close at hand.</p></div></div>
+</section>
+{% endblock %}

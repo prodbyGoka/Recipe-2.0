@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}My recipe box{% endblock %}
+{% block content %}
+<section class="page-shell"><div class="page-intro"><span class="eyebrow">Your personal recipe box</span><h1>Good things to make again.</h1><p>Keep the recipes you love close at hand, ready for the next time you need a little inspiration.</p></div>
+  {% if saved %}<div class="recipe-grid">{% for item in saved %}{% set recipe = item.recipe %}{% include "_recipe_card.html" %}{% endfor %}</div>{% else %}<div class="empty-state"><h2>Your recipe box is ready.</h2><p>Save a recipe you love and it’ll be waiting here.</p><a class="button button-primary" href="{{ url_for('recipe_list') }}">Browse recipes</a></div>{% endif %}
+</section>
+{% endblock %}
