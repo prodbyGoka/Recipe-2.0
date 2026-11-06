@@ -117,7 +117,27 @@ def validate_csrf_token():
 @app.context_processor
 def inject_template_values():
     session_csrf_token()
-    return {"current_user": current_user(), "csrf_token": session["csrf_token"], "recipe_image": recipe_image}
+    def meal_type_label(meal_type, language="en"):
+        labels = {
+            "појадок": {"en": "Breakfast", "mk": "Појадок"},
+            "ручек": {"en": "Lunch", "mk": "Ручек"},
+            "вечера": {"en": "Dinner", "mk": "Вечера"},
+        }
+        return labels.get(meal_type, {}).get(language, meal_type.capitalize())
+
+    def recipe_language(recipe):
+        for result in recipe.ai_results:
+            if result.search and result.search.language in {"en", "mk"}:
+                return result.search.language
+        return "en"
+
+    return {
+        "current_user": current_user(),
+        "csrf_token": session["csrf_token"],
+        "recipe_image": recipe_image,
+        "meal_type_label": meal_type_label,
+        "recipe_language": recipe_language,
+    }
 
 
 def session_csrf_token():
@@ -295,6 +315,22 @@ def create_recommendations(data):
     has_basics = data.get("has_basics", True)
     if not isinstance(diet, str) or len(diet) > 40:
         raise ValueError("Choose a valid diet preference.")
+    if diet.strip().casefold() == "vegan":
+        meat_terms = {
+            "meat", "chicken", "beef", "pork", "lamb", "turkey", "duck",
+            "bacon", "ham", "sausage", "fish", "salmon", "tuna", "shrimp",
+            "месо", "пилешко", "говедско", "свинско", "јагнешко", "риба",
+        }
+        conflicting = [
+            name for name in ingredients
+            if name.casefold() in meat_terms
+            or any(term in name.casefold().split() for term in meat_terms)
+        ]
+        if conflicting:
+            raise ValueError(
+                "Vegan meal ideas aren’t available with meat or fish in your ingredients. "
+                "Remove them or choose a different eating style."
+            )
     if not isinstance(allergens, str) or len(allergens) > 200:
         raise ValueError("Allergen notes must be 200 characters or fewer.")
     if not isinstance(language, str) or language not in {"en", "mk"}:
@@ -324,10 +360,17 @@ def create_recommendations(data):
 
     saved_recipes = []
     staple_names = {"сол", "црн пипер", "масло", "вода"}
-    for recipe_number, generated in enumerate(generated_recipes, start=1):
+    for generated in generated_recipes:
         title = generated["title"]
         if db_session.query(Recipe.id).filter_by(title=title).first() is not None:
-            title = f"{title[:125].rstrip()} (AI {search.id}-{recipe_number})"
+            suffix_number = 2
+            while True:
+                suffix = f" ({suffix_number})"
+                candidate = f"{title[:150 - len(suffix)].rstrip()}{suffix}"
+                if db_session.query(Recipe.id).filter_by(title=candidate).first() is None:
+                    title = candidate
+                    break
+                suffix_number += 1
 
         recipe = Recipe(
             title=title,

@@ -2,12 +2,12 @@
 {% block title %}{{ recipe.title }}{% endblock %}
 {% block content %}
 <section class="page-shell">
-  <p class="eyebrow"><a href="{{ url_for('recipe_list') }}">Recipe collection</a> &nbsp;·&nbsp; {{ recipe.meal_type|capitalize }}</p>
+  <p class="eyebrow"><a href="{{ url_for('recipe_list') }}">Recipe collection</a> &nbsp;·&nbsp; {{ meal_type_label(recipe.meal_type, recipe_language(recipe)) }}</p>
   <div class="detail-hero">
     <div class="detail-copy"><span class="eyebrow">A BiteCraft kitchen favourite</span><h1>{{ recipe.title }}</h1><p>{{ recipe.description }}</p><div class="detail-stats"><span><strong>{{ recipe.time_minutes }} min</strong>total time</span><span><strong>{{ recipe.ingredient_links|length }}</strong>ingredients</span><span><strong>★ {{ average_rating or 'New' }}</strong>{{ reviews|length }} reviews</span></div>
       <div class="detail-actions">{% if current_user %}<form method="post" action="{{ url_for('toggle_saved_recipe', recipe_id=recipe.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="next" value="{{ request.path }}"><button class="button {{ 'button-light' if is_saved else 'button-primary' }}" type="submit">{{ '✓ Saved to my recipe box' if is_saved else '♡ Save recipe' }}</button></form>{% else %}<a class="button button-primary" href="{{ url_for('login', next=request.path) }}">♡ Log in to save</a>{% endif %}<a class="button button-quiet" href="{{ url_for('recipe_list') }}">Browse more recipes</a></div>
     </div>
-    <div class="detail-image"><img src="{{ recipe_image(recipe.id) }}" alt="{{ recipe.title }}"></div>
+    <a class="detail-image detail-image-search" href="https://www.google.com/search?tbm=isch&amp;q={{ (recipe.title ~ ' food')|urlencode }}" target="_blank" rel="noopener noreferrer" aria-label="Find food photos for {{ recipe.title }} on Google Images"><span aria-hidden="true">⌕</span><strong>Find {{ recipe.title }} photos on Google Images ↗</strong></a>
   </div>
   <div class="detail-layout">
     <section class="detail-panel"><h2>What you’ll need</h2><ul class="ingredient-list">{% for link in recipe.ingredient_links %}<li><input type="checkbox" aria-label="Mark {{ link.ingredient.name }} as ready"><span>{{ link.ingredient.name }}</span><span class="ingredient-quantity">{{ link.quantity }}</span></li>{% endfor %}</ul>{% if recipe.equipment_names %}<h2 style="margin-top:36px">Kitchen tools</h2><p class="subtle" style="font-size:12px;line-height:1.7">{{ recipe.equipment_names|join(', ') }}</p>{% endif %}</section>

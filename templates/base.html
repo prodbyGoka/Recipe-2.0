@@ -12,7 +12,7 @@
 <body>
   <header class="site-header">
     <a class="brand" href="{{ url_for('index') }}" aria-label="BiteCraft home">
-      <span class="brand-mark" aria-hidden="true">✳</span><span>BiteCraft</span>
+      <span class="brand-mark" aria-hidden="true"><img src="{{ url_for('static', filename='images/bitecraft-mark.svg') }}" alt=""></span><span>BiteCraft</span>
     </a>
     <nav class="main-nav" aria-label="Main navigation">
       <a class="{% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}">Discover</a>
@@ -36,7 +36,7 @@
     {% block content %}{% endblock %}
   </main>
   <footer class="site-footer">
-    <a class="brand brand-footer" href="{{ url_for('index') }}"><span class="brand-mark" aria-hidden="true">✳</span><span>BiteCraft</span></a>
+    <a class="brand brand-footer" href="{{ url_for('index') }}"><span class="brand-mark" aria-hidden="true"><img src="{{ url_for('static', filename='images/bitecraft-mark.svg') }}" alt=""></span><span>BiteCraft</span></a>
     <p>Good food starts with what you have.</p>
     <div><a href="{{ url_for('recipe_list') }}">Recipe collection</a><a href="{{ url_for('create') }}">Find a meal</a></div>
     <span class="footer-note">Made for everyday kitchens · © BiteCraft</span>

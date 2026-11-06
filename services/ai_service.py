@@ -143,7 +143,7 @@ def recommend_recipes(
             "Set GEMINI_API_KEY in the server environment to enable AI recipe suggestions."
         )
 
-    model = os.environ.get("GEMINI_MODEL", "gemini-3.8-flash")
+    model = os.environ.get("GEMINI_MODEL", "gemini-3.1-flash-lite")
     output_language = "Macedonian" if language == "mk" else "English"
     prompt = (
         "You are a practical home cooking assistant. Suggest exactly three distinct recipes. "

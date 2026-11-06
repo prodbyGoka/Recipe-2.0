@@ -1,4 +1,4 @@
 <article class="recipe-card">
-  <a class="recipe-photo" href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}"><img src="{{ recipe_image(recipe.id) }}" alt="A serving suggestion for {{ recipe.title }}" loading="lazy"><span class="photo-tag">{{ recipe.meal_type|capitalize }}</span></a>
+  <a class="recipe-photo recipe-photo-search" href="https://www.google.com/search?tbm=isch&amp;q={{ (recipe.title ~ ' food')|urlencode }}" target="_blank" rel="noopener noreferrer" aria-label="Find food photos for {{ recipe.title }} on Google Images"><span class="recipe-photo-prompt"><span aria-hidden="true">⌕</span>Find this dish on Google Images ↗</span><span class="photo-tag">{{ meal_type_label(recipe.meal_type, recipe_language(recipe)) }}</span></a>
   <div class="recipe-card-body"><h3><a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}">{{ recipe.title }}</a></h3><p>{{ recipe.description }}</p><div class="recipe-meta"><span class="rating">★ {{ recipe.average_rating or 'New' }}</span><span>{{ recipe.time_minutes }} min</span><span>{{ recipe.ingredient_links|length }} ingredients</span></div></div>
 </article>
